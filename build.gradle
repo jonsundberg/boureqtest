@@ -1,0 +1,61 @@
+apply plugin: 'gradle-one-jar'
+apply plugin: 'application'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+allprojects {
+
+    version = "0.1-SNAPSHOT"
+    group = "com.bouvet"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+		// docs https://github.com/rholder/gradle-one-jar
+        classpath 'com.github.rholder:gradle-one-jar:1.0.3'
+    }
+}
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+project.ext {
+    dropwizardVersion = '1.0.1'
+}
+
+dependencies {
+	compile "io.dropwizard:dropwizard-core:${dropwizardVersion}"
+  	compile "io.dropwizard:dropwizard-assets:${dropwizardVersion}"
+	compile "io.dropwizard:dropwizard-client:${dropwizardVersion}"
+	compile "io.dropwizard:dropwizard-testing:${dropwizardVersion}"
+}
+subprojects {
+	dependencies {
+		compile rootProject
+	}
+}
+
+mainClassName = 'com.bouvet.App'
+
+task oneJar(type: OneJar) {
+    mainClass = mainClassName
+    additionalDir = file('src/main/resources')
+}
+
+run {
+    args 'server', './src/dist/config/theapp.yml'
+}
+
+artifacts {
+    oneJar
+}
